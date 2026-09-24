@@ -1,0 +1,26 @@
+{
+  "providers": {
+    "vertex-litellm": {
+      "baseUrl": "http://127.0.0.1:4180",
+      "api": "anthropic-messages",
+      "apiKey": "veriharness-local-proxy",
+      "compat": {
+        "supportsEagerToolInputStreaming": false,
+        "supportsLongCacheRetention": false,
+        "supportsCacheControlOnTools": false,
+        "forceAdaptiveThinking": true,
+        "allowEmptySignature": true
+      },
+      "models": [
+        {
+          "id": "claude-opus-4-8",
+          "name": "Claude Opus 4.8 (Vertex via litellm)",
+          "reasoning": true,
+          "input": ["text"],
+          "contextWindow": 200000,
+          "maxTokens": 32000
+        }
+      ]
+    }
+  }
+}

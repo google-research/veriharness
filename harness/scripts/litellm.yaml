@@ -1,0 +1,31 @@
+# Copyright 2026 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Local litellm proxy that serves Claude on Vertex AI to the pi agent runtime (pi provider
+# "vertex-litellm" in harness/pi-home/models.json points at this port). Set VERTEX_PROJECT
+# and, optionally, VERTEX_LOCATION in the environment before scripts/litellm_up.sh.
+model_list:
+  - model_name: claude-opus-4-8
+    litellm_params:
+      model: vertex_ai/claude-opus-4-8
+      vertex_project: os.environ/VERTEX_PROJECT
+      vertex_location: os.environ/VERTEX_LOCATION
+
+litellm_settings:
+  drop_params: true
+  request_timeout: 1800
+
+# Not a secret: the proxy listens on localhost only and this key merely has to match
+# the apiKey in harness/pi-home/models.json.
+general_settings:
+  master_key: veriharness-local-proxy

@@ -1,0 +1,11 @@
+# Harness core (driver, runner, score) is standard-library only.
+# Skill scripts and spreadsheet rendering:
+openpyxl
+python-docx
+python-pptx
+pdfplumber
+pymupdf
+# APEX task prompts and rubrics (materialize/apex.py, grade/apex.py):
+huggingface_hub
+# Optional: evidence-patch/scripts/pageprobe.py drives a headless Chromium when
+# playwright (and its browser) is installed; without it the script reports and exits.

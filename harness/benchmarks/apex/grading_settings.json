@@ -1,0 +1,6 @@
+{
+  "llm_judge_model": "gemini/gemini-3-flash-preview",
+  "llm_judge_extra_args": {
+    "reasoning_effort": "low"
+  }
+}
