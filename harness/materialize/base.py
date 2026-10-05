@@ -36,6 +36,7 @@ from dataclasses import dataclass, field
 import json
 from pathlib import Path
 import shutil
+import tempfile
 
 from harness.config import DATA, bench_root
 from harness.views import render_views
@@ -169,6 +170,21 @@ def write_task(bench: str, pool: str, task: Task) -> dict:
   return meta
 
 
+def _write_meta(path: Path, meta: dict) -> None:
+  path.parent.mkdir(parents=True, exist_ok=True)
+  temporary = None
+  try:
+    with tempfile.NamedTemporaryFile(
+        mode="w", encoding="utf-8", dir=path.parent, delete=False
+    ) as fh:
+      temporary = Path(fh.name)
+      json.dump(meta, fh, indent=1, ensure_ascii=False)
+    temporary.replace(path)
+  finally:
+    if temporary is not None:
+      temporary.unlink(missing_ok=True)
+
+
 def run_cli(bench: str, pools: list, iter_tasks, argv=None) -> int:
   ap = argparse.ArgumentParser(description=f"materialize {bench}")
   ap.add_argument("--pool", choices=[*pools, "all"], default="all")
@@ -188,12 +204,13 @@ def run_cli(bench: str, pools: list, iter_tasks, argv=None) -> int:
       if a.limit is not None and done >= a.limit:
         break
       marker = DATA / bench / pool / ".done" / task.key
-      if marker.exists():
+      if marker.exists() and task.key in merged:
         done += 1
         continue
       if len(task.rollouts) < 2:
         continue
       merged[task.key] = write_task(bench, pool, task)
+      _write_meta(meta_file, merged)
       marker.parent.mkdir(parents=True, exist_ok=True)
       marker.touch()
       done += 1
@@ -202,7 +219,6 @@ def run_cli(bench: str, pools: list, iter_tasks, argv=None) -> int:
           f"({len(task.rollouts)} rollouts)",
           flush=True,
       )
-    meta_file.parent.mkdir(parents=True, exist_ok=True)
-    meta_file.write_text(json.dumps(merged, indent=1, ensure_ascii=False))
+    _write_meta(meta_file, merged)
     print(f"[{bench}/{pool}] total {done}; meta: {meta_file}", flush=True)
   return 0
